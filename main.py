@@ -33,55 +33,48 @@ def main():
     # --- UPDATE 2: INITIALIZE YOUR ENGINE ---
     logic_engine = LogicEngine() if LogicEngine else None
     
-    # Initialize Sniffer
-    print("Initializing Network Sniffer...")
-    sniffer = SnifferThread(data_queue)
-    
-    # --- UPDATE 3: INJECT YOUR ENGINE INTO SNIFFER ---
-    sniffer.detector = detector
-    sniffer.logic_engine = logic_engine  # <--- PASSING YOUR CODE TO MEMBER A
+    # Initialize Sniffer Manager directly
+    # The Manager will handle creating the SnifferThread when needed
+    manager = SnifferManager(data_queue, detector, logic_engine)
 
-    # Define Start/Stop callbacks for GUI
+    # Define Start/Stop callbacks for GUI using the manager
     def start_sniffing():
-        if not sniffer.is_alive():
-            sniffer.start()
-        else:
-            sniffer.stop_event.clear()
+        manager.start()
 
     def stop_sniffing():
-        sniffer.stop()
-
-    class SnifferManager:
-        def __init__(self, queue, detector, logic_engine):
-            self.queue = queue
-            self.detector = detector
-            self.logic_engine = logic_engine # Store reference
-            self.thread = None
-            
-        def start(self):
-            if self.thread and self.thread.is_alive():
-                return
-            self.thread = SnifferThread(self.queue)
-            self.thread.detector = self.detector
-            self.thread.logic_engine = self.logic_engine # Inject here too
-            self.thread.start()
-            
-        def stop(self):
-            if self.thread:
-                self.thread.stop()
-    
-    # Updated Manager with Logic Engine
-    manager = SnifferManager(data_queue, detector, logic_engine)
+        manager.stop()
 
     print("Starting GUI...")
     app = NetGuardDashboard(
-        start_callback=manager.start,
-        stop_callback=manager.stop,
+        start_callback=start_sniffing,
+        stop_callback=stop_sniffing,
         log_queue=data_queue
     )
     
     app.protocol("WM_DELETE_WINDOW", lambda: (manager.stop(), app.quit()))
     app.mainloop()
+
+class SnifferManager:
+    def __init__(self, queue, detector, logic_engine):
+        self.queue = queue
+        self.detector = detector
+        self.logic_engine = logic_engine # Store reference
+        self.thread = None
+            
+    def start(self):
+        if self.thread and self.thread.is_alive():
+            return
+        
+        # Use default interface (Wi-Fi/Ethernet) which is more reliable on Windows
+        # when targeting LAN IP
+        self.thread = SnifferThread(self.queue)
+        self.thread.detector = self.detector
+        self.thread.logic_engine = self.logic_engine # Inject here too
+        self.thread.start()
+        
+    def stop(self):
+        if self.thread:
+            self.thread.stop()
 
 if __name__ == "__main__":
     main()

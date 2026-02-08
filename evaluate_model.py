@@ -46,7 +46,14 @@ def evaluate_model():
         print(f"Test data shape: {X_test.shape}")
         
         print("Running predictions...")
-        y_pred = clf.predict(X_test)
+        y_pred_raw = clf.predict(X_test)
+        
+        # Load Encoder to decode predictions
+        label_encoder = joblib.load("label_encoder.pkl")
+        y_pred_labels = label_encoder.inverse_transform(y_pred_raw)
+        
+        # Convert predictions to binary: 'normal' -> 1, Attack -> -1
+        y_pred = np.array([1 if label == 'normal' else -1 for label in y_pred_labels])
         
         # Calculate metrics
         accuracy = accuracy_score(y_true, y_pred)
