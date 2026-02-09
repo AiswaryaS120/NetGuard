@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
 import joblib
 import os
 
@@ -30,19 +31,25 @@ def train_supervised_model():
         X_train = df.iloc[:, feature_indices].values
         
         # Labels (Column 41)
-        # 'normal' -> 1, anything else -> -1 (to match our convention)
-        y_train = df.iloc[:, 41].apply(lambda x: 1 if x == 'normal' else -1).values
+        # Use simple label encoding to handle multi-class targets
+        y_raw = df.iloc[:, 41].values
         
+        label_encoder = LabelEncoder()
+        y_train = label_encoder.fit_transform(y_raw)
+
         print(f"Training data shape: {X_train.shape}")
+        print(f"Classes found: {list(label_encoder.classes_)}")
         
-        print("Training Random Forest Classifier...")
+        print("Training Random Forest Classifier (Multi-class)...")
         # Random Forest is a robust supervised model
         clf = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
         clf.fit(X_train, y_train)
         
-        # Save model
+        # Save model and encoder
         joblib.dump(clf, MODEL_FILE)
+        joblib.dump(label_encoder, "label_encoder.pkl")
         print(f"Supervised Model saved to {MODEL_FILE}")
+        print("Label Encoder saved to label_encoder.pkl")
         
     except Exception as e:
         print(f"An error occurred during training: {e}")

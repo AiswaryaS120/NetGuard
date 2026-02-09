@@ -29,7 +29,8 @@ class NetGuardDashboard(ctk.CTk):
         self.stop_callback = stop_callback
         self.log_queue = log_queue
         self.is_running = False
-        self.traffic_log = [] 
+        # Limit traffic log to avoid memory leaks (last 10,000 packets)
+        self.traffic_log = deque(maxlen=10000) 
         
         # --- DATA STREAMS ---
         self.max_data_points = 60
@@ -298,6 +299,9 @@ class NetGuardDashboard(ctk.CTk):
                     proto = data.get('protocol', '?')
                     rule_msg = data.get('rule_alert')
                     
+                    # DEBUG: Trace every packet processing in GUI
+                    # print(f"[GUI DEBUG] Processing packet. Rule Alert: {rule_msg}, ML Alert: {data.get('anomaly')}")
+                    
                     # Normal Log
                     # log_line = f"TCP/IP: {src} -> {dst} [Len: {random.randint(40, 1500)}]"
                     # We now use structured data
@@ -305,8 +309,18 @@ class NetGuardDashboard(ctk.CTk):
                     self.log_interface("", is_alert=False, data=data)
                     
                     # Handling Alerts
+                    # Handling Alerts
+                    
+                    # Handling Alerts
                     if rule_msg:
-                        self.log_interface(f"ALERT: {rule_msg}", is_alert=True)
+                        self.log_interface(f"RULE ALERT: {rule_msg}", is_alert=True)
+                        self.last_anomaly_time = current_time
+                        max_threat = 1.0
+                    
+                    # Handling ML Anomalies
+                    anomaly_label = data.get('anomaly')
+                    if anomaly_label and anomaly_label != 'normal' and anomaly_label != 1:
+                        self.log_interface(f"ML ALERT: {anomaly_label} Detected [Src: {src}]", is_alert=True)
                         self.last_anomaly_time = current_time
                         max_threat = 1.0
                     
