@@ -41,6 +41,7 @@ class NetGuardDashboard(ctk.CTk):
         
         # State
         self.last_anomaly_time = 0
+        self.last_anomaly_type = "low"
         self.packet_count = 0
         self.start_time = 0
 
@@ -146,6 +147,10 @@ class NetGuardDashboard(ctk.CTk):
         self.ax2.set_ylim(0, 1) # Probability 0-1
         self.ax2.grid(True, color=COLOR_GRID, linestyle='--')
         self.ax2.tick_params(colors='gray', labelsize=8)
+        
+        # State Threshold Lines
+        self.ax2.axhline(0.8, color=COLOR_DANGER, linestyle=':', alpha=0.4)
+        self.ax2.axhline(0.3, color='orange', linestyle=':', alpha=0.4)
 
         # Canvas
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.graph_container)
@@ -284,7 +289,6 @@ class NetGuardDashboard(ctk.CTk):
             
             # 2. Process Packet Queue
             packets_this_tick = 0
-            max_threat = 0.0
             
             while not self.log_queue.empty():
                 try:
@@ -299,33 +303,39 @@ class NetGuardDashboard(ctk.CTk):
                     proto = data.get('protocol', '?')
                     rule_msg = data.get('rule_alert')
                     
-                    # DEBUG: Trace every packet processing in GUI
-                    # print(f"[GUI DEBUG] Processing packet. Rule Alert: {rule_msg}, ML Alert: {data.get('anomaly')}")
-                    
                     # Normal Log
-                    # log_line = f"TCP/IP: {src} -> {dst} [Len: {random.randint(40, 1500)}]"
-                    # We now use structured data
                     data['len'] = random.randint(40, 1500) # Mock length if missing
                     self.log_interface("", is_alert=False, data=data)
-                    
-                    # Handling Alerts
-                    # Handling Alerts
                     
                     # Handling Alerts
                     if rule_msg:
                         self.log_interface(f"RULE ALERT: {rule_msg}", is_alert=True)
                         self.last_anomaly_time = current_time
-                        max_threat = 1.0
+                        if "FLOOD" in rule_msg.upper() or "DDOS" in rule_msg.upper():
+                            self.last_anomaly_type = "high"
+                        else:
+                            self.last_anomaly_type = "low"
                     
                     # Handling ML Anomalies
                     anomaly_label = data.get('anomaly')
                     if anomaly_label and anomaly_label != 'normal' and anomaly_label != 1:
                         self.log_interface(f"ML ALERT: {anomaly_label} Detected [Src: {src}]", is_alert=True)
                         self.last_anomaly_time = current_time
-                        max_threat = 1.0
+                        self.last_anomaly_type = "low"
                     
                 except Exception:
                     break
+
+            # Threat Assessment Logic
+            time_since_anomaly = current_time - self.last_anomaly_time
+            max_threat = 0.0
+            
+            if time_since_anomaly < 5.0 and self.last_anomaly_time > 0:
+                # Severity depends on volume: high attack = Critical, low attack = Moderate
+                if self.last_anomaly_type == "high" or packets_this_tick > 50:
+                    max_threat = 1.0  # High attack -> Critical
+                else:
+                    max_threat = 0.5  # Low attack -> Moderate
 
             # 3. Update Traffic Stats
             elapsed = current_time - self.start_time
@@ -335,7 +345,7 @@ class NetGuardDashboard(ctk.CTk):
             
             # 4. Updates Charts
             self.traffic_history.append(packets_this_tick)
-            self.threat_history.append(max_threat if max_threat > 0 else (self.threat_history[-1]*0.9)) # Decay
+            self.threat_history.append(max_threat if max_threat > 0.0 else (self.threat_history[-1]*0.9 if self.threat_history else 0.0))
             
             # Redraw Graphs
             self.line1.set_data(range(len(self.traffic_history)), self.traffic_history)
@@ -349,11 +359,17 @@ class NetGuardDashboard(ctk.CTk):
             
             self.canvas.draw()
             
-            # 5. Update Threat Level
-            if current_time - self.last_anomaly_time < 5.0:
+            # 5. Update Threat Level Display
+            current_threat = self.threat_history[-1] if self.threat_history else 0.0
+            if current_threat >= 0.8:
                  self.update_hud_val(self.card_threat, "CRITICAL", COLOR_DANGER)
+                 self.line2.set_color(COLOR_DANGER)
+            elif current_threat >= 0.3:
+                 self.update_hud_val(self.card_threat, "MODERATE", "orange")
+                 self.line2.set_color("orange")
             else:
                  self.update_hud_val(self.card_threat, "SECURE", "#00ff00")
+                 self.line2.set_color("#00ff00")
 
         self.after(500, self.update_ui_loop) # Twice per second updates for smoother feel
 
