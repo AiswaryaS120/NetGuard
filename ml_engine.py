@@ -99,7 +99,8 @@ class AnomalyDetector:
                     threshold = 20 if generic_label == 'Port Scan' else 100
                     if generic_label in ['DoS Attack', 'Port Scan', 'Brute Force/Malware', 'Privilege Escalation'] and count < threshold:
                          return "normal"
-                    
+                    print(f"[ML] count={count}, label={generic_label}")
+
                     return generic_label
                 else:
                     return pred_idx

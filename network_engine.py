@@ -95,7 +95,7 @@ class SnifferThread(threading.Thread):
         if packet.haslayer(TCP):
             src_port = packet[TCP].sport
             dst_port = packet[TCP].dport
-            flag = packet[TCP].flags
+            flag = str(packet[TCP].flags)
         elif packet.haslayer(UDP):
             src_port = packet[UDP].sport
             dst_port = packet[UDP].dport
@@ -145,10 +145,13 @@ class SnifferThread(threading.Thread):
             # Rule check
             if self.logic_engine:
                 simple_data = {
-                    'src': features['src_ip'],
-                    'dst_port': features['dst_port'],
-                    'flag': features.get('flag', '')
-                }
+                        'src':      features['src_ip'],
+                        'dst':      features['dst_ip'],    # needed for port scan detection
+                        'dst_port': features['dst_port'],
+                        'flag':     features.get('flag', ''),
+                        'time':     float(packet.time)
+                        }
+
                 alert_msg = self.logic_engine.check_packet(simple_data)
                 if alert_msg:
                     features['rule_alert'] = alert_msg
@@ -158,21 +161,45 @@ class SnifferThread(threading.Thread):
         except Exception as e:
             print(f"Error processing packet: {e}")
 
+    def _get_best_iface(self):
+        """
+        Auto-detect the best interface to sniff on:
+        Picks the one with a real LAN IP (192.168.x.x / 10.x.x.x / 172.x.x.x).
+        Falls back to Scapy's default if none found.
+        """
+        import socket
+        from scapy.all import get_if_list, get_if_addr
+        for iface in get_if_list():
+            try:
+                addr = get_if_addr(iface)
+                if addr and not addr.startswith('0.') and not addr.startswith('127.'):
+                    # Prefer private LAN address
+                    if (addr.startswith('192.168.') or
+                        addr.startswith('10.')     or
+                        addr.startswith('172.')):
+                        return iface, addr
+            except Exception:
+                continue
+        return None, None   # fallback: let Scapy decide
+
     def run(self):
         print("Sniffer thread started...")
 
-        try:
-            # You can set specific interface here:
-            # conf.iface = "Wi-Fi"   # Windows example
-            # conf.iface = "wlan0"   # Linux example
+        iface, addr = self._get_best_iface()
+        if iface:
+            print(f"[*] Sniffing on interface: {iface}  ({addr})")
+        else:
+            print("[*] No LAN interface found — using Scapy default interface")
 
-            sniff(prn=self.packet_callback,
+        try:
+            sniff(iface=iface,                            # None = Scapy default
+                  prn=self.packet_callback,
                   store=0,
                   stop_filter=lambda x: self.stop_event.is_set(),
-                  promisc=True)  # Try to enable promiscuous mode
+                  promisc=True)
         except Exception as e:
             print(f"Sniffer failed: {e}")
-            print("Tip: Try running the program with administrator privileges")
+            print("Tip: Run the program as Administrator")
 
     def stop(self):
         self.stop_event.set()
