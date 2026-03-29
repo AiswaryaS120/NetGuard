@@ -485,7 +485,7 @@ class NetGuardDashboard(ctk.CTk):
                     if anomaly_label and anomaly_label != 'normal' and anomaly_label != 1:
                         self.log_interface(f"ML: {anomaly_label} detected [{src}]", is_alert=True)
                         self.last_anomaly_time = current_time
-                        if anomaly_label in ("DoS Attack", "Brute Force/Malware", "Privilege Escalation"):
+                        if anomaly_label in ("DoS Attack", "Brute Force/Malware", "Privilege Escalation", "Zero-Day Attack"):
                             self.last_anomaly_type = "high"
                         else:
                             self.last_anomaly_type = "low"

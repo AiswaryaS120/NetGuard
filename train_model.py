@@ -7,28 +7,12 @@ import os
 # Dataset Path
 DATASET_DIR = r"nsl-kdd"
 TRAIN_FILE = os.path.join(DATASET_DIR, "KDDTrain+.txt")
-MODEL_FILE = "model.pkl"
+MODEL_FILE = "iforest_model.pkl"
 
 def get_feature_indices():
     """
     Returns the list of 0-based indices for numerical features to use.
-    
-    selected_features = [
-        0,  # duration
-        4,  # src_bytes
-        5,  # dst_bytes
-        22, # count
-        23, # srv_count
-        28, # same_srv_rate
-        29, # diff_srv_rate
-        31, # dst_host_count
-        32, # dst_host_srv_count
-        33, # dst_host_same_srv_rate
-        34, # dst_host_diff_srv_rate
-        35, # dst_host_same_src_port_rate
-        37, # dst_host_serror_rate
-        38, # dst_host_srv_serror_rate
-    ]
+    Same 14 features used by Random Forest and live monitoring.
     """
     return [0, 4, 5, 22, 23, 28, 29, 31, 32, 33, 34, 35, 37, 38]
 
@@ -39,27 +23,44 @@ def train_model():
 
     print("Loading dataset...")
     try:
-        # KDDTrain+.txt does not have headers
         df = pd.read_csv(TRAIN_FILE, header=None)
         
-        # Select expanded feature set
+        # --- FILTER NORMAL TRAFFIC ONLY ---
+        # Column 41 contains the attack label
+        # Isolation Forest should learn what "normal" looks like
+        # so it can flag anything different as a potential zero-day.
+        normal_mask = df.iloc[:, 41] == 'normal'
+        df_normal = df[normal_mask]
+        
+        print(f"Total samples: {len(df)}")
+        print(f"Normal samples (used for training): {len(df_normal)}")
+        print(f"Attack samples (excluded): {len(df) - len(df_normal)}")
+        
         feature_indices = get_feature_indices()
-        X_train = df.iloc[:, feature_indices].values
+        X_train = df_normal.iloc[:, feature_indices].values
         
-        print(f"Training data shape: {X_train.shape}")
+        # --- APPLY SAME SCALER AS RANDOM FOREST ---
+        # Both models must see the same scaled features
+        scaler_path = "scaler.pkl"
+        if os.path.exists(scaler_path):
+            scaler = joblib.load(scaler_path)
+            X_train = scaler.transform(X_train)
+            print(f"Applied existing scaler from {scaler_path}")
+        else:
+            print("WARNING: scaler.pkl not found. Train Random Forest first!")
+            print("         Run: python train_supervised.py")
+            return
         
-        # Train Isolation Forest
-        # Tuning: contamination=0.01 (assuming anomalies are rare in normal traffic training data)
-        # Note: KDDTrain+ contains attacks, so it's not a 'clean' baseline. 
-        # IsolationForest works by assuming anomalies are 'few and different'. 
-        # KDDTrain+ is actually ~46% anomaly. Training IF on mixed labeled data as if it were normal 
-        # is suboptimal, but fits the 'unsupervised' requirement if labels weren't known. 
-        # For the purpose of this step "Tune IsolationForest", we will adjust parameters.
-        print("Training Isolation Forest model (Expanded Features)...")
+        print(f"\nTraining data shape: {X_train.shape}")
+        
+        # --- TRAIN ISOLATION FOREST ---
+        # contamination='auto' lets sklearn decide the threshold
+        # n_estimators=200 for robust anomaly detection
+        # max_samples=256 is optimal for Isolation Forest (per original paper)
         clf = IsolationForest(
             n_estimators=200, 
             max_samples=256, 
-            contamination=0.1, 
+            contamination=0.01,  # Set lower contamination to reduce false positives
             random_state=42,
             n_jobs=-1
         )
@@ -67,10 +68,15 @@ def train_model():
         
         # Save model
         joblib.dump(clf, MODEL_FILE)
-        print(f"Model saved to {MODEL_FILE}")
+        print(f"\nIsolation Forest saved to {MODEL_FILE}")
+        print("This model will flag traffic that deviates from normal patterns")
+        print("as potential zero-day attacks.")
         
     except Exception as e:
         print(f"An error occurred during training: {e}")
+        import traceback
+        traceback.print_exc()
 
 if __name__ == "__main__":
     train_model()
+
