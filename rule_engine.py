@@ -145,21 +145,53 @@ class LogicEngine:
         # 3. ANOMALY DETECTION                                                #
         # ------------------------------------------------------------------ #
         alerts = []
+        is_port_scan = False
+
+        # C. Port Scan (Evaluated first to logically suppress overlapping SYN Floods)
+        
+        # Avoid false positives from established connection replies and browser tabs.
+        # Restrict scan detection to SYN-only packets and exclude common web ports.
+        if dst_port and dst_port != 0 and dst_ip and is_syn:
+            if dst_port in self.COMMON_WEB_PORTS:
+                # Debug Logging - confirm browser traffic is suppressed (uncomment to use)
+                # print(f"[DEBUG] Suppressed port scan check for web port {dst_port} from {src_ip}")
+                pass
+            else:
+                key = (src_ip, dst_ip)
+                self._update_scan_hits(key, dst_port, now)
+                # Count unique ports THIS src hit on THIS specific dst
+                unique_ports = len(set(p for _, p in self.scan_hits.get(key, [])))
+
+                if unique_ports > self.SCAN_THRESHOLD:
+                    is_port_scan = True
+                    if self._can_alert(src_ip, 'SCAN', now):
+                        print(f"[DEBUG] Real scan triggered from {src_ip} on {unique_ports} ports")
+                        alerts.append(
+                            f"[!] PORT SCAN: {src_ip} -> {dst_ip} "
+                            f"hit {unique_ports} ports in {self.SCAN_WINDOW}s"
+                        )
+
+        # Also consider it a port scan if we recently alerted for it
+        if not is_port_scan:
+            last_scan_time = self.last_alert_at.get((src_ip, 'SCAN'), 0.0)
+            if now - last_scan_time <= self.ALERT_COOLDOWN:
+                is_port_scan = True
 
         # A. SYN Flood -------------------------------------------------------
-        syn_thresh = self._calculate_threshold(
-            stats['syn_history'],
-            self.DEFAULT_SYN_MEAN,
-            self.DEFAULT_SYN_STD,
-            self.SYN_K,
-            self.MIN_SYN_THRESHOLD,
-        )
-        if is_syn and stats['current_syn'] > syn_thresh:
-            if self._can_alert(src_ip, 'SYN', now):
-                alerts.append(
-                    f"[!] DYNAMIC SYN FLOOD: {src_ip} -> "
-                    f"{stats['current_syn']} SYN/s (Threshold: {syn_thresh:.1f})"
-                )
+        if not is_port_scan:
+            syn_thresh = self._calculate_threshold(
+                stats['syn_history'],
+                self.DEFAULT_SYN_MEAN,
+                self.DEFAULT_SYN_STD,
+                self.SYN_K,
+                self.MIN_SYN_THRESHOLD,
+            )
+            if is_syn and stats['current_syn'] > syn_thresh:
+                if self._can_alert(src_ip, 'SYN', now):
+                    alerts.append(
+                        f"[!] DYNAMIC SYN FLOOD: {src_ip} -> "
+                        f"{stats['current_syn']} SYN/s (Threshold: {syn_thresh:.1f})"
+                    )
 
         # B. DDoS / Volume ---------------------------------------------------
         ddos_thresh = self._calculate_threshold(
@@ -189,29 +221,6 @@ class LogicEngine:
                         f"[!] DYNAMIC {attack_type} FLOOD: {src_ip} -> "
                         f"{stats['current_pkt']} pkt/s (Threshold: {ddos_thresh:.1f}, Div: {diversity_ratio:.2f})"
                     )
-
-        # C. Port Scan -------------------------------------------------------
-        
-        # Avoid false positives from established connection replies and browser tabs.
-        # Restrict scan detection to SYN-only packets and exclude common web ports.
-        if dst_port and dst_port != 0 and dst_ip and is_syn:
-            if dst_port in self.COMMON_WEB_PORTS:
-                # Debug Logging - confirm browser traffic is suppressed (uncomment to use)
-                # print(f"[DEBUG] Suppressed port scan check for web port {dst_port} from {src_ip}")
-                pass
-            else:
-                key = (src_ip, dst_ip)
-                self._update_scan_hits(key, dst_port, now)
-                # Count unique ports THIS src hit on THIS specific dst
-                unique_ports = len(set(p for _, p in self.scan_hits.get(key, [])))
-
-                if unique_ports > self.SCAN_THRESHOLD:
-                    if self._can_alert(src_ip, 'SCAN', now):
-                        print(f"[DEBUG] Real scan triggered from {src_ip} on {unique_ports} ports")
-                        alerts.append(
-                            f"[!] PORT SCAN: {src_ip} -> {dst_ip} "
-                            f"hit {unique_ports} ports in {self.SCAN_WINDOW}s"
-                        )
 
         return " | ".join(alerts) if alerts else None
 
