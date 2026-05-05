@@ -1,0 +1,27 @@
+# Python internals
+# __pycache__/
+# *.pyc
+# *.pyo
+# *.pyd
+
+# Datasets
+# nsl-kdd/
+
+# Models and Large Binary Artifacts
+# *.pkl
+# rf_model.pkl
+# model.pkl
+# label_encoder.pkl
+
+# Logs and Debug
+*.log
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# IDE specific
+.vscode/
+.idea/
+__pycache__/
+*.pyc
