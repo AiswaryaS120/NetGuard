@@ -1,9 +1,9 @@
 # **NetGuard: Real-Time Network Anomaly Detection System using Machine Learning**
 ---
-<h1 align="center">AETHER IDE</h1>
+<h1 align="center">NETGUARD</h1>
 
 <p align="center">
-  <b>Real-Time Collaborative Development Environment</b>
+  <b> Real-Time Network Anomaly Detection System using Machine Learning</b>
 </p>
 
 <p align="center">
