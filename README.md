@@ -53,4 +53,11 @@ Alerting: The GUI triggers a visual red alert when the anomaly score or statisti
 ## 📊 **Expected Performance**
 Accuracy: Projected between 90.0% and 95.6% based on NSL-KDD benchmarks for Isolation Forest.
 
-Efficiency: Designed to be lightweight with real-time monitoring of CPU and RAM usage to ensure minimal system overhead.
+Efficiency: Designed to be lightweight
+ with real-time monitoring of CPU and RAM usage to ensure minimal system overhead.
+
+##  **Screenshots**
+
+<img width="548" height="245" alt="netguard1image" src="https://github.com/user-attachments/assets/2c14957e-e77b-49ef-bb2b-1c48517007b1" />
+<img width="548" height="245" alt="netguard1image" src="https://github.com/user-attachments/assets/aa76e59f-cf8f-4bbf-8de7-0ab4c3e73e9c" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8babeb5e-69da-413f-a4ca-1e5aab0f389f" />
