@@ -61,7 +61,7 @@ Efficiency: Designed to be lightweight
 
 <img width="548" height="245" alt="netguard1image" src="https://github.com/user-attachments/assets/2c14957e-e77b-49ef-bb2b-1c48517007b1" />
 
-<img width="1600" height="900" alt="netguard image 3" src="https://github.com/user-attachments/assets/b29b4ebb-628e-4ee2-bbb0-7d7f57d18254" />
+<img width="548" height="245" alt="netguard image 3" src="https://github.com/user-attachments/assets/b29b4ebb-628e-4ee2-bbb0-7d7f57d18254" />
 
-<img width="1600" height="900" alt="netguardimage2" src="https://github.com/user-attachments/assets/416d4b95-740a-4941-a911-7987798ad535" />
+<img width="548" height="245" alt="netguardimage2" src="https://github.com/user-attachments/assets/416d4b95-740a-4941-a911-7987798ad535" />
 
