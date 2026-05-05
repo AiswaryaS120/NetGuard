@@ -2,8 +2,8 @@ import joblib
 import numpy as np
 
 def main():
-    scaler = joblib.load("scaler.pkl")
-    iforest = joblib.load("iforest_model.pkl")
+    scaler = joblib.load("models/scaler.pkl")
+    iforest = joblib.load("models/iforest_model.pkl")
 
     print(f"Loaded Scaler & IForest")
     print(f"{'Count':<8} {'SameSrv%':<10} {'Srv%':<10} {'IF Score':<10} {'Prediction':<10}")

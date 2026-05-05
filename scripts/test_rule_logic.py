@@ -1,5 +1,5 @@
 import time
-from rule_engine import LogicEngine
+from src.rule_engine import LogicEngine
 
 def test_logic():
     print("--- STARTING DYNAMIC LOGIC TEST ---")

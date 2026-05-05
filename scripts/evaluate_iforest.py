@@ -7,11 +7,11 @@ import numpy as np
 import joblib
 import os
 
-DATASET_DIR = r"nsl-kdd"
+DATASET_DIR = r"data/nsl-kdd"
 TEST_FILE = os.path.join(DATASET_DIR, "KDDTest+.txt")
-IFOREST_FILE = "iforest_model.pkl"
-SCALER_FILE = "scaler.pkl"
-RF_FILE = "rf_model.pkl"
+IFOREST_FILE = "models/iforest_model.pkl"
+SCALER_FILE = "models/scaler.pkl"
+RF_FILE = "models/rf_model.pkl"
 
 FEATURE_INDICES = [0, 4, 5, 22, 23, 28, 29, 31, 32, 33, 34, 35, 37, 38]
 

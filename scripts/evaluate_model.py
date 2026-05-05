@@ -5,9 +5,9 @@ import os
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, classification_report
 
 # Dataset Path
-DATASET_DIR = r"nsl-kdd"
+DATASET_DIR = r"data/nsl-kdd"
 TEST_FILE = os.path.join(DATASET_DIR, "KDDTest+.txt")
-MODEL_FILE = "rf_model.pkl"
+MODEL_FILE = "models/rf_model.pkl"
 
 def evaluate_model():
     print(f"Loading model from {MODEL_FILE}...")
@@ -23,11 +23,11 @@ def evaluate_model():
 
     # Load scaler
     scaler = None
-    if os.path.exists("scaler.pkl"):
-        scaler = joblib.load("scaler.pkl")
+    if os.path.exists("models/scaler.pkl"):
+        scaler = joblib.load("models/scaler.pkl")
         print("Scaler loaded.")
     else:
-        print("Warning: scaler.pkl not found. Running without scaling.")
+        print("Warning: models/scaler.pkl not found. Running without scaling.")
 
     print(f"Loading test dataset from {TEST_FILE}...")
     if not os.path.exists(TEST_FILE):

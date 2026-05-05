@@ -22,7 +22,7 @@ def check_module(name):
         return False
 
 # 1. Check Imports
-modules = ['rule_engine', 'ml_engine', 'network_engine', 'main', 'gui_dashboard']
+modules = ['src.rule_engine', 'src.ml_engine', 'src.network_engine', 'src.main', 'src.gui_dashboard']
 passing = True
 
 print("\n--- Phase 1: Module Loading ---")
@@ -39,7 +39,7 @@ print("\n--- Phase 2: Component Instantiation ---")
 
 try:
     print("[*] Instantiating LogicEngine...", end=" ")
-    from rule_engine import LogicEngine
+    from src.rule_engine import LogicEngine
     logic = LogicEngine()
     print("OK")
     
@@ -56,7 +56,7 @@ try:
         print("WARNING (No alert triggered for 200 packets, Check Thresholds)")
 
     print("[*] Instantiating AnomalyDetector (ML)...", end=" ")
-    from ml_engine import AnomalyDetector
+    from src.ml_engine import AnomalyDetector
     ml = AnomalyDetector()
     print("OK")
 
@@ -68,7 +68,7 @@ try:
     
     # 3. Network Engine logic
     print("[*] Instantiating TrafficMonitor...", end=" ")
-    from network_engine import TrafficMonitor
+    from src.network_engine import TrafficMonitor
     monitor = TrafficMonitor()
     packet = {
         'src_ip': '192.168.1.50',

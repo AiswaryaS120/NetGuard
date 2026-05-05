@@ -37,8 +37,8 @@ ATTACK_MAPPING = {
 }
 
 class AnomalyDetector:
-    def __init__(self, model_path='rf_model.pkl', encoder_path='label_encoder.pkl',
-                 scaler_path='scaler.pkl', iforest_path='iforest_model.pkl'):
+    def __init__(self, model_path='models/rf_model.pkl', encoder_path='models/label_encoder.pkl',
+                 scaler_path='models/scaler.pkl', iforest_path='models/iforest_model.pkl'):
         self.model_path = model_path
         self.encoder_path = encoder_path
         self.scaler_path = scaler_path

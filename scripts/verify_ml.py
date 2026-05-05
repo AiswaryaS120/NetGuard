@@ -2,7 +2,7 @@ import joblib
 import numpy as np
 import os
 import time
-from ml_engine import AnomalyDetector
+from src.ml_engine import AnomalyDetector
 
 def test_ml_predictions():
     print("Initializing AnomalyDetector...")

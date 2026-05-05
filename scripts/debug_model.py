@@ -1,10 +1,10 @@
 import joblib
 import pandas as pd
-from ml_engine import AnomalyDetector
+from src.ml_engine import AnomalyDetector
 
 def debug_model():
     print("Loading Random Forest Model...")
-    detector = AnomalyDetector(model_path='rf_model.pkl')
+    detector = AnomalyDetector(model_path='models/rf_model.pkl')
     
     if not detector.model:
         print("[-] Model not found.")

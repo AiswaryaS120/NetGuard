@@ -5,9 +5,9 @@ import joblib
 import os
 
 # Dataset Path
-DATASET_DIR = r"nsl-kdd"
+DATASET_DIR = r"data/nsl-kdd"
 TRAIN_FILE = os.path.join(DATASET_DIR, "KDDTrain+.txt")
-MODEL_FILE = "iforest_model.pkl"
+MODEL_FILE = "models/iforest_model.pkl"
 
 def get_feature_indices():
     """
@@ -41,13 +41,13 @@ def train_model():
         
         # --- APPLY SAME SCALER AS RANDOM FOREST ---
         # Both models must see the same scaled features
-        scaler_path = "scaler.pkl"
+        scaler_path = "models/scaler.pkl"
         if os.path.exists(scaler_path):
             scaler = joblib.load(scaler_path)
             X_train = scaler.transform(X_train)
             print(f"Applied existing scaler from {scaler_path}")
         else:
-            print("WARNING: scaler.pkl not found. Train Random Forest first!")
+            print("WARNING: models/scaler.pkl not found. Train Random Forest first!")
             print("         Run: python train_supervised.py")
             return
         

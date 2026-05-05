@@ -14,7 +14,7 @@ Run:  python test_dashboard_threats.py
 """
 
 import time
-from ml_engine import AnomalyDetector
+from src.ml_engine import AnomalyDetector
 
 # --- TEST VECTORS ---
 # Each vector is 14 features matching the order in network_engine.py:

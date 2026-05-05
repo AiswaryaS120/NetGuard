@@ -7,9 +7,9 @@ import joblib
 import os
 
 # Dataset Path
-DATASET_DIR = r"nsl-kdd"
+DATASET_DIR = r"data/nsl-kdd"
 TRAIN_FILE = os.path.join(DATASET_DIR, "KDDTrain+.txt")
-MODEL_FILE = "rf_model.pkl"
+MODEL_FILE = "models/rf_model.pkl"
 
 def get_feature_indices():
     """
@@ -81,16 +81,16 @@ def train_supervised_model():
         
         # --- SAVE ---
         joblib.dump(clf, MODEL_FILE)
-        joblib.dump(scaler, "scaler.pkl")
+        joblib.dump(scaler, "models/scaler.pkl")
         print(f"\nModel saved to {MODEL_FILE}")
-        print("Scaler saved to scaler.pkl")
+        print("Scaler saved to models/scaler.pkl")
         
         # Also save a label encoder for backward compatibility with ml_engine.py
         # Binary: classes are [0='normal', 1='attack']
         label_encoder = LabelEncoder()
         label_encoder.classes_ = np.array(['normal', 'attack'])
-        joblib.dump(label_encoder, "label_encoder.pkl")
-        print("Label Encoder saved to label_encoder.pkl")
+        joblib.dump(label_encoder, "models/label_encoder.pkl")
+        print("Label Encoder saved to models/label_encoder.pkl")
         
     except Exception as e:
         print(f"An error occurred during training: {e}")

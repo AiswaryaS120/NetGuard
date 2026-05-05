@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import MagicMock
 import queue
-from network_engine import SnifferThread
-from ml_engine import AnomalyDetector
+from src.network_engine import SnifferThread
+from src.ml_engine import AnomalyDetector
 import time
 
 class TestSystemIntegration(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestSystemIntegration(unittest.TestCase):
 
     def test_model_prediction(self):
         print("\nTesting Model Prediction...")
-        detector = AnomalyDetector(model_path='rf_model.pkl')
+        detector = AnomalyDetector(model_path='models/rf_model.pkl')
         
         if not detector.model:
             print("WARNING: Model not found, skipping prediction test.")
