@@ -1,4 +1,33 @@
 # **NetGuard: Real-Time Network Anomaly Detection System using Machine Learning**
+---
+<h1 align="center">AETHER IDE</h1>
+
+<p align="center">
+  <b>Real-Time Collaborative Development Environment</b>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.2-blue?logo=react" />
+  <img src="https://img.shields.io/badge/Node.js-20-green?logo=node.js" />
+  <img src="https://img.shields.io/badge/Socket.IO-4.8-black?logo=socket.io" />
+  <img src="https://img.shields.io/badge/MongoDB-7.0-green?logo=mongodb" />
+  <img src="https://img.shields.io/badge/Docker-Compose-blue?logo=docker" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
+</p>
+
+<p align="center">
+  Write code, draw diagrams, talk, and chat — all in one shared workspace.
+</p>
+
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#api-reference">API Reference</a> •
+  <a href="#contributing">Contributing</a>
+</p>
+
+---
 
 
 
