@@ -16,15 +16,20 @@
 </p>
 
 <p align="center">
-  Write code, draw diagrams, talk, and chat — all in one shared workspace.
+  Detect. Analyze. Protect.
 </p>
 
 <p align="center">
-  <a href="#features">Features</a> •
-  <a href="#architecture">Architecture</a> •
-  <a href="#quick-start">Quick Start</a> •
-  <a href="#api-reference">API Reference</a> •
-  <a href="#contributing">Contributing</a>
+  <a href="#Key Features">Key Features</a> •
+  <a href="#Tech Stack">Tech Stack</a> •
+  <a href="#System Architecture & Flow">Architecture</a> •
+  <a href="#Exected Performancne">Performance</a> •
+  <a href="#Project Structure">Structure</a> •
+  <a href="#Installation & Setup">Installation</a> •
+  <a href="#Usage Guide">Usage Guide</a> •
+  <a href="#System Verification and Testing">Testing</a> •
+  <a href="#Training & Evaluating Models">Models</a> •
+  <a href="#Screenshots">screenshot</a>
 </p>
 
 ---
@@ -79,7 +84,7 @@ Anomaly Scoring: The Isolation Forest model calculates the "path length" for eac
 
 Alerting: The GUI triggers a visual red alert when the anomaly score or statistical threshold is breached.
 
-## 📊 **Expected Performance**
+## 📊 **Exected Performancne**
 Accuracy: Projected between 90.0% and 95.6% based on NSL-KDD benchmarks for Isolation Forest.
 
 Efficiency: Designed to be lightweight
