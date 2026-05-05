@@ -7,11 +7,11 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/React-19.2-blue?logo=react" />
-  <img src="https://img.shields.io/badge/Node.js-20-green?logo=node.js" />
-  <img src="https://img.shields.io/badge/Socket.IO-4.8-black?logo=socket.io" />
-  <img src="https://img.shields.io/badge/MongoDB-7.0-green?logo=mongodb" />
-  <img src="https://img.shields.io/badge/Docker-Compose-blue?logo=docker" />
+  <img src="https://img.shields.io/badge/Python-3.x-blue?logo=python" />
+  <img src="https://img.shields.io/badge/CustomTkinter-GUI-purple" />
+  <img src="https://img.shields.io/badge/Scapy-Networking-green" />
+  <img src="https://img.shields.io/badge/Random%20Forest-ML-orange" />
+  <img src="https://img.shields.io/badge/Isolation%20Forest-Anomaly-red" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
