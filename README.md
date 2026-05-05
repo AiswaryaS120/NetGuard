@@ -1,5 +1,3 @@
-# **NetGuard: Real-Time Network Anomaly Detection System using Machine Learning**
----
 <h1 align="center">NETGUARD</h1>
 
 <p align="center">
